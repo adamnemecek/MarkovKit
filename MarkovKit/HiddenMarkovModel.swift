@@ -8,18 +8,18 @@
 
 import Foundation
 
-public class HiddenMarkovModel<StateType:Hashable, ObservationType:Hashable> {
+open class HiddenMarkovModel<StateType:Hashable, ObservationType:Hashable> {
     /// A list of possible hidden states
-    public var states:[StateType]
+    open var states:[StateType]
     
     /// Prior probability distribution of the states
-    public var initialProbabilities:ProbabilityVector<StateType>
+    open var initialProbabilities:ProbabilityVector<StateType>
     
     /// Probabilities of transitions between states
-    public var transitionProbabilities:MarkovModel<StateType>;
+    open var transitionProbabilities:MarkovModel<StateType>;
     
     /// Probability of output observations for each state
-    public var emissionProbabilities:ProbabilityMatrix<StateType, ObservationType>
+    open var emissionProbabilities:ProbabilityMatrix<StateType, ObservationType>
     
     public init(
         states: [StateType],
@@ -39,7 +39,7 @@ public class HiddenMarkovModel<StateType:Hashable, ObservationType:Hashable> {
      
      Computes a likely sequence of hidden states that could have produced the observations.
      */
-    public func calculateStates(observations:[ObservationType]) -> [StateType] {
+    open func calculateStates(_ observations:[ObservationType]) -> [StateType] {
         var t:[StateType:VStructure<StateType>] = [:]
         for state in self.states {
             let p0 = self.initialProbabilities[state] ?? 0

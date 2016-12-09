@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class MarkovModel<StateType:Hashable>: ProbabilityMatrix<StateType, StateType> {
+open class MarkovModel<StateType:Hashable>: ProbabilityMatrix<StateType, StateType> {
     
     public required init(dictionaryLiteral elements: (Key, Value)...) {
         super.init()
@@ -25,7 +25,7 @@ public class MarkovModel<StateType:Hashable>: ProbabilityMatrix<StateType, State
      - parameter stopCondition: An optional test to stop the chain early, if desired.
      
      */
-    public func generateChain(from initialState:StateType?=nil, maximumLength:Int) -> [StateType] {
+    open func generateChain(from initialState:StateType?=nil, maximumLength:Int) -> [StateType] {
         var result:[StateType] = []
         if let initialState = initialState {
             result.append(initialState)

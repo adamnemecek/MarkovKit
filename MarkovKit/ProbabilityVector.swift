@@ -8,12 +8,12 @@
 
 import Foundation
 
-public class ProbabilityVector<T:Hashable>: DictionaryLiteralConvertible {
+open class ProbabilityVector<T:Hashable>: ExpressibleByDictionaryLiteral {
     public typealias Key = T
     public typealias Value = Double
     
-    private var items:[T] = []
-    private var probabilities:[Double] {
+    fileprivate var items:[T] = []
+    fileprivate var probabilities:[Double] {
         get {
             return self.items.map { self.itemsToProbabilities[$0]! }
         }
@@ -28,8 +28,8 @@ public class ProbabilityVector<T:Hashable>: DictionaryLiteralConvertible {
         }
     }
     
-    private var itemsToProbabilities:[T:Double] = [:]
-    private var needsNormalization:Bool = true
+    fileprivate var itemsToProbabilities:[T:Double] = [:]
+    fileprivate var needsNormalization:Bool = true
 
     public init(items:[T]) {
         self.items = items
@@ -52,17 +52,17 @@ public class ProbabilityVector<T:Hashable>: DictionaryLiteralConvertible {
         }
     }
     
-    public func probabilityOfItem(item:T) -> Double {
+    open func probabilityOfItem(_ item:T) -> Double {
         self.normalizeIfNeeded()
         return self.itemsToProbabilities[item] ?? 0
     }
 
-    public func setProbabilityOfItem(item:T, _ probability:Double) {
+    open func setProbabilityOfItem(_ item:T, _ probability:Double) {
         self.itemsToProbabilities[item] = probability
         self.needsNormalization = true
     }
     
-    public subscript(item:T) -> Double {
+    open subscript(item:T) -> Double {
         get {
             return self.probabilityOfItem(item)
         }
@@ -74,7 +74,7 @@ public class ProbabilityVector<T:Hashable>: DictionaryLiteralConvertible {
         }
     }
     
-    public func randomItem() -> T? {
+    open func randomItem() -> T? {
         self.normalizeIfNeeded()
         
         let random = Double(arc4random()) / Double(UINT32_MAX)
@@ -89,7 +89,7 @@ public class ProbabilityVector<T:Hashable>: DictionaryLiteralConvertible {
         return self.items.last
     }
     
-    private func normalize() {
+    fileprivate func normalize() {
         var total:Double = 0
         for p in self.itemsToProbabilities.values {
             total = total + p
@@ -103,27 +103,27 @@ public class ProbabilityVector<T:Hashable>: DictionaryLiteralConvertible {
         }
     }
     
-    private func normalizeIfNeeded() {
+    fileprivate func normalizeIfNeeded() {
         if self.needsNormalization {
             self.normalize()
             self.needsNormalization = false
         }
     }
 
-    internal class func parseCSV(string:String) -> [Double] {
+    internal class func parseCSV(_ string:String) -> [Double] {
         let separator = ","
         
         var probabilities:[Double] = []
-        for value in string.componentsSeparatedByString(separator) {
-            let value = value.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet())
+        for value in string.components(separatedBy: separator) {
+            let value = value.trimmingCharacters(in: CharacterSet.whitespaces)
             let probability = Double(value) ?? 0
             probabilities.append(probability)
         }
         return probabilities
     }
     
-    internal func readProbabilitiesFromCSVString(string:String) {
-        self.probabilities = self.dynamicType.parseCSV(string)
+    internal func readProbabilitiesFromCSVString(_ string:String) {
+        self.probabilities = type(of: self).parseCSV(string)
     }
     
 }

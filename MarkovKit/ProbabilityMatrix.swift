@@ -13,17 +13,17 @@ import Foundation
  
  There is a special row for initial states, since we're not treating nil as a valid state.
 */
-public class ProbabilityMatrix<SourceStateType:Hashable, DestinationStateType:Hashable>: DictionaryLiteralConvertible {
+open class ProbabilityMatrix<SourceStateType:Hashable, DestinationStateType:Hashable>: ExpressibleByDictionaryLiteral {
     public typealias RowType = ProbabilityVector<DestinationStateType>
 
     public typealias Key = SourceStateType
     public typealias Value = RowType
     
     /// The probabilities of each destination state without an initial state.
-    private var initialProbabilities:RowType = ProbabilityVector()
+    fileprivate var initialProbabilities:RowType = ProbabilityVector()
     
     /// The probabilities of transitioning from each source state to each output state.
-    private var rows:[SourceStateType: RowType] = [:]
+    fileprivate var rows:[SourceStateType: RowType] = [:]
     
     public required init(dictionaryLiteral elements: (Key, Value)...) {
         for (key, value) in elements {
@@ -47,14 +47,14 @@ public class ProbabilityMatrix<SourceStateType:Hashable, DestinationStateType:Ha
     
     public convenience init(sourceStates:[SourceStateType], destinationStates:[DestinationStateType], CSVString string:String) {
         var probabilitySets:[[Double]] = []
-        for line in string.componentsSeparatedByCharactersInSet(NSCharacterSet.newlineCharacterSet()) {
+        for line in string.components(separatedBy: CharacterSet.newlines) {
             let probabilities = ProbabilityVector<SourceStateType>.parseCSV(line)
             probabilitySets.append(probabilities)
         }
         self.init(sourceStates: sourceStates, destinationStates: destinationStates, probabilitySets: probabilitySets)
     }
     
-    public func probabilitiesFromState(state:SourceStateType?) -> RowType? {
+    open func probabilitiesFromState(_ state:SourceStateType?) -> RowType? {
         if let state = state {
             return self.rows[state]
         } else {
@@ -62,7 +62,7 @@ public class ProbabilityMatrix<SourceStateType:Hashable, DestinationStateType:Ha
         }
     }
     
-    public func setProbabilitiesFromState(state:SourceStateType?, probabilities:RowType) {
+    open func setProbabilitiesFromState(_ state:SourceStateType?, probabilities:RowType) {
         if let state = state {
             self.rows[state] = probabilities
         } else {
@@ -70,7 +70,7 @@ public class ProbabilityMatrix<SourceStateType:Hashable, DestinationStateType:Ha
         }
     }
     
-    public subscript(state:SourceStateType?) -> RowType? {
+    open subscript(state:SourceStateType?) -> RowType? {
         get {
             return self.probabilitiesFromState(state)
         }
@@ -82,15 +82,15 @@ public class ProbabilityMatrix<SourceStateType:Hashable, DestinationStateType:Ha
     }
 
     
-    public func probabilityOfState(state:DestinationStateType, fromState initialState:SourceStateType?) -> Double {
+    open func probabilityOfState(_ state:DestinationStateType, fromState initialState:SourceStateType?) -> Double {
         return self.probabilitiesFromState(initialState)?.probabilityOfItem(state) ?? 0
     }
     
-    public func transitionFromState(state:SourceStateType?) -> DestinationStateType? {
+    open func transitionFromState(_ state:SourceStateType?) -> DestinationStateType? {
         return self.probabilitiesFromState(state)?.randomItem()
     }
     
-    public func inverted() -> Self {
+    open func inverted() -> Self {
         return self
     }
 }
